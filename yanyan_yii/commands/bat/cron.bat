@@ -1,0 +1,1 @@
+D:\PhpSystem\php-5.6.31\php.exe -q D:/PhpSystem/www/yanyan_local/commands/shell/shell.php
