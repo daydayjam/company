@@ -1,0 +1,159 @@
+html, body, div, ul, li, img, dl, dt, dd {
+	margin: 0;
+	padding: 0;
+}
+ul, li {
+	list-style: none;
+}
+a {
+	text-decoration: none;
+}
+.common-header {
+	color: $fff;
+	font-size: 14px;
+	position: absolute;
+	top: 0;
+	padding-left: 318px;
+	height: 120px;
+	right: 10%;
+	margin-left: -508px;
+}
+.common-header .logo-href {
+	color: #fff;
+	font-size: 25px;
+	display: block;
+	width: 315px;
+	height: 120px;
+	line-height: 120px;
+	position: absolute;
+	left: 0;
+	top: 0;
+}
+.common-header .header-nav {
+	display: flex;
+}
+.common-header .header-nav li {
+	padding: 0 30px;
+	height: 120px;
+	line-height: 120px;
+	
+}
+.common-header .header-nav li a {
+	color: #fff;
+	font-size: 25px;
+}
+
+.wrapper .banner {
+	/* background-color: #1e78eb; */
+	background: url(./image/pc_bg.jpg);
+	height: 540px;
+	padding-top: 120px;
+}
+.wrapper .banner .entryCon {
+	display: flex;
+	position: absolute;
+	top: 398px;
+	left: 0;
+}
+.wrapper .banner .banner-inner {
+	position: relative;
+	width: 1100px;
+	height: 540px;
+	margin: 0 auto;
+}
+.wrapper .banner .banner-inner .app-desc {
+	float: left;
+	color: #fff;
+	font-weight: 150;
+}
+.wrapper .banner .banner-inner .banner-image {
+	float: right;
+}
+.wrapper .banner .banner-inner .banner-image img{
+	width: 250px;
+}
+@media screen and (max-width:900px){
+	.wrapper .banner .banner-inner .banner-image img{
+		
+	}
+}
+.wrapper .banner .entryCon #download-btn {
+	font-size: 20px;
+	text-align: center;
+	width: 175px;
+	height: 51px;
+	line-height: 51px;
+	color: #BBADAC;
+	background: #fff;
+	border: 2px solid #fff;
+}
+.wrapper .part {
+	max-width: 1200px;
+	min-width: 500px;
+	text-align: center;
+	margin: 180px auto 0;
+}
+.wrapper .title {
+	font-size: 30px;
+	color: #4a4a4a;
+	font-weight: 100;
+	height: 30px;
+	line-height: 30px;
+}
+.wrapper .desc {
+	font-size: 20px;
+	line-height: 30px;
+	color: #6f6f6f;
+	font-weight: 100;
+	margin: 0 auto;
+}
+.wrapper #download {
+	margin-bottom: 180px;
+}
+.wrapper #download ul {
+	width: 550px;
+	margin: 75px auto 0;
+}
+.wrapper #download .download-box {
+	display: inline-flex;
+	width: 243px;
+	height: 243px;
+	border: 1px solid #e4e4e4;
+	margin-left: 15px;
+	color: #8b8b8b;
+}
+.wrapper #download .download-box:hover {
+	color: #fff;
+	/* background-color: #BBADAC; */
+	box-shadow: 5px 15px 30px rgba(0, 0, 0, .3);
+	/* border: 1px solid #BBADAC; */
+}
+.wrapper #download .download-box .icon {
+	width: 43px;
+	height: 50px;
+	display: block;
+	margin: 0 auto 18px;
+}
+.wrapper #download ul a {
+	display: block;
+	color: #8b8b8b;
+	padding-top: 70px;
+	margin: 0 auto;
+}
+.wrapper #download .download-box .icon.ios {
+	background: url(./image/icon.png) 0 0 no-repeat;
+}
+.wrapper #download .download-box .icon.android {
+	background: url(./image/icon.png) -78px 0 no-repeat;
+}
+.common-footer {
+	color: #fff;
+	text-align: center;
+	font-size: 12px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	background: #BBADAC;
+}
+.common-footer a {
+	color: #646464;
+}
