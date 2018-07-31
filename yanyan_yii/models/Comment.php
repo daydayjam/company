@@ -101,7 +101,7 @@ class Comment extends ActiveRecord {
      * @return mixed array=评论成功
      */
     public function add($comment, $filmId = 0, $epNum = 0, $ctype = 1, $mcid = 0, $cmtId = 0, $assoctype = 0, $from = 0, $picArr = []) {
-        $loginUid = Cache::hget('id');
+        $loginUid = Cache::hget('id') ? Cache::hget('id') : 0;
         //参数判断
         if(!in_array($ctype, self::CTYPE)) {
             $this->addError('', '-4:参数格式有误');
@@ -934,7 +934,7 @@ class Comment extends ActiveRecord {
      * @param int $from 来源资讯页还是非资讯页
      */
     public function praise($id, $assocType = 0, $from = 0) {
-        $loginUid = Cache::hget('id');
+        $loginUid = Cache::hget('id') ? Cache::hget('id') : 0;
         if(empty($id)) {
             $this->addError('', '-3:参数不可为空');
             return false;

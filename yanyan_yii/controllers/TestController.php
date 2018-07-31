@@ -329,8 +329,26 @@ class TestController extends Controller {
     }
     
     public function actionE() {
-        $result = mb_strpos('罗英锡&#8194;', '&#8194;');
-        print_r($result);
+        $host = '127.0.0.1';
+        $port = '3306';
+        $user = 'root1';
+        $pwd = '';
+        $dbName = 'yanyan';
+
+        try{
+            $Pdo = new PDO('mysql:$host;', $user, $pwd);
+        }catch (Exception $e){        //捕获异常
+            echo $e->getMessage();    //打印异常信息
+        }
+//        error_reporting(0);
+        try{
+            $Mysqli = new Mysqli($host, $user, $pwd, $dbName);
+            if($Mysqli->connect_errno) {
+                throw new Exception('数据库连接失败');
+            }
+        }catch (Exception $e){        //捕获异常
+            echo $e->getMessage();    //打印异常信息
+        }
     }
     
     

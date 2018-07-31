@@ -44,13 +44,13 @@ class UserIdentity {
             $this->errorMsg = '您的密码有误，请确认';
             return false;
         }
-        $ustatus = $UserRecord->status;
-        if($ustatus < 1) {
-            if($ustatus == -1) {
+        $status = $UserRecord->status;
+        if($status < 1) {
+            if($status == -1) {
                 $code = -103;
                 $msg = '该用户已因涉嫌违规已被停封处理，无法操作';
             } else {
-                $hourType = $ustatus == -2 ? 8 : 24;
+                $hourType = $status == -2 ? 8 : 24;
                 $timeDiff = Tool::getTimeDiff($UserRecord->unfreeze_time, date('Y-m-d H:i:s'));
                 $hour = floor($timeDiff/3600);
                 $second = floor(($timeDiff/3600 - $hour)*60);
@@ -86,7 +86,7 @@ class UserIdentity {
         
         $code = $userInfo['verify_code'];
         Cache::hset('id', $id, $code);
-        Cache::hset('ustatus', $UserRecord->status, $code);
+        Cache::hset('status', $UserRecord->status, $code);
         Cache::hset('ease_uid', $UserRecord->ease_uid, $code);
         Cache::hset('nick', $UserRecord->nickname, $code);
         Cache::hset('unfreeze_time', $UserRecord->unfreeze_time, $code);

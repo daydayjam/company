@@ -55,7 +55,7 @@ class UserHelper extends ActiveRecord {
      * @param int $uid 用户ID
      * @return int 账号状态
      */
-    public function getUstatus($uid) {
+    public function getstatus($uid) {
         $Record = $this->findOne();
     }
     
@@ -96,16 +96,16 @@ class UserHelper extends ActiveRecord {
     
     /**
      * 获取用户冻结状态错误信息
-     * @param type $ustatus 用户冻结状态 -1=停封；-2=冻结8小时；-3=冻结24小时
+     * @param type $status 用户冻结状态 -1=停封；-2=冻结8小时；-3=冻结24小时
      * @param type $type 业务类型 register,login
      * @return boolean false
      */
-    public function getUstatusMsg($ustatus, $unfreezeTime, $type = 'register') {
-        if($ustatus < 1) {
-            if($ustatus == -1) {
+    public function getstatusMsg($status, $unfreezeTime, $type = 'register') {
+        if($status < 1) {
+            if($status == -1) {
                  $msg = $type == 'register' ? '-103:该账号已被停封，无法再次注册' : '-103:该用户已因涉嫌违规已被停封处理，无法操作';
             } else {
-                $hourType = $ustatus == -2 ? 8 : 24;
+                $hourType = $status == -2 ? 8 : 24;
                 $timeDiff = Tool::getTimeDiff($unfreezeTime, date('Y-m-d H:i:s'));
                 $hour = floor($timeDiff/3600);
                 $second = floor(($timeDiff/3600 - $hour)*60);

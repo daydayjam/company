@@ -30,7 +30,7 @@ class Praise extends ActiveRecord {
      * @return boolean|int
      */
     public function addAndGetPraiseCnt($assocId, $assocType = 0) {
-        $loginUid = Cache::hget('id');
+        $loginUid = Cache::hget('id') ? Cache::hget('id') : 0;
         $Record = $this->findByCondition(['uid'=>$loginUid, 'assoc_type'=>$assocType, 'comment_id'=>$assocId])->one();
         if(!$Record) {
             $this->uid = $loginUid;

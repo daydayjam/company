@@ -63,7 +63,7 @@ class Report extends ActiveRecord {
                 $this->addError('', '-7:要举报的用户不存在');
                 return false;
            }
-           if($UserReportedRecord->ustatus == -1) {
+           if($UserReportedRecord->status == -1) {
                $this->addError('', '-103:该用户已因涉嫌违规已被停封处理，无法操作');
                 return false;
            }

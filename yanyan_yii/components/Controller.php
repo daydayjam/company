@@ -70,14 +70,14 @@ class Controller extends \yii\web\Controller {
             $this->show(-1, '请重新登录');
         }
         //用户状态判断
-        $ustatus = Cache::hget('ustatus');
-        if($ustatus == 1) {   //用户为正常用户
+        $status = Cache::hget('status');
+        if($status == 1) {   //用户为正常用户
             return;
-        }else if($ustatus < -1) { //用户为冻结用户
+        }else if($status < -1) { //用户为冻结用户
             if(in_array($route1, $routes['freeze']) || in_array($route2, $routes['freeze'])) {
                 return;
             }
-            $hourType = $ustatus == -2 ? 8 : 24;
+            $hourType = $status == -2 ? 8 : 24;
             $timeDiff = Tool::getTimeDiff(Cache::hget('unfreeze_time'), date('Y-m-d H:i:s'));
             $hour = floor($timeDiff/3600);
             $second = floor(($timeDiff/3600 - $hour)*60);
