@@ -4,11 +4,28 @@
     </head>
     <body>
         <script>
-            var arr = new Array();
-            arr[0] = 1;
-            arr[1] = [1,2,3];
-            console.log(arr);
             
+        function getSystemDate(){  
+            var systemDate = new Date();  
+            // 获取当年  
+            var year = systemDate.getFullYear();  
+            // 获取当月 （月+1是因为js中月份是按0开始的）  
+            var month = systemDate.getMonth() + 1;  
+            // 获取当日  
+            var day =  systemDate.getDate();  
+            if (day < 10) { // 如果日小于10，前面拼接0  
+                day = '0' + day;  
+            }  
+            if (month < 10) { // 如果月小于10，前面拼接0  
+                month = '0' + month;  
+            }  
+            return [year, month, day].join('-');  
+        } 
+        
+        var dd = getSystemDate();
+        console.log(dd);
+        var oldDd = '2019-07-02';
+        console.log(dd > oldDd);
         </script>
     </body> 
     

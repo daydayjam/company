@@ -553,7 +553,7 @@ class Comment extends ActiveRecord {
      * @return boolean|int 是否创建成功, int=创建成功
      */
     public function addCmt($params) {
-        $loginUid = Cache::hget('id');
+        $loginUid = Cache::hget('id') ? Cache::hget('id') : 0;
         $this->uid = $loginUid;
         $this->assoc_type = isset($params['assoc_type']) ? $params['assoc_type'] : 0;
         $this->assoc_id = isset($params['assoc_id']) ? $params['assoc_id'] : 0;

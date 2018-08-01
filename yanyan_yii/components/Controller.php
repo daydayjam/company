@@ -58,6 +58,9 @@ class Controller extends \yii\web\Controller {
         }
         $route2 = $this->getUniqueId() . '/*';//全匹配
         if(in_array($route1, $routes['guest']) || in_array($route2, $routes['guest'])) {
+            if(!empty($code)) {
+                Cache::expire($code, Yii::$app->params['expire']);
+            }
             return;
         }
         if(empty($code)) {//如果code为空，用户未登录，验证访问路由是否为非登录用户可访问
@@ -72,9 +75,13 @@ class Controller extends \yii\web\Controller {
         //用户状态判断
         $status = Cache::hget('status');
         if($status == 1) {   //用户为正常用户
+            //每次访问成功更新code过期时间
+            Cache::expire($code, Yii::$app->params['expire']);
             return;
         }else if($status < -1) { //用户为冻结用户
             if(in_array($route1, $routes['freeze']) || in_array($route2, $routes['freeze'])) {
+                //每次访问成功更新code过期时间
+                Cache::expire($code, Yii::$app->params['expire']);
                 return;
             }
             $hourType = $status == -2 ? 8 : 24;
@@ -85,8 +92,6 @@ class Controller extends \yii\web\Controller {
         }else { //用户为封号用户
             $this->show(-103, '您的账号已因涉嫌违规已被停封处理');
         }
-        //每次访问成功更新code过期时间
-        Cache::expire($code, Yii::$app->params['expire']);
     }
     
     /**

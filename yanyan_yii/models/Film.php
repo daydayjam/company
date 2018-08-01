@@ -151,6 +151,10 @@ class Film extends ActiveRecord {
         if (!is_numeric($page) || !is_numeric($pagesize) || $page < 0 || $pagesize < 0) {
             return $this->addError('', '-4:参数格式有误');
         }
+        $redisHotKey = 'FILM_HOT_LIST';
+        if(Cache::exists($redisHotKey)) {
+            return json_decode(Cache::get($redisHotKey), true);
+        }
         $select = 'id,kind,title,cover,year,genre as tag,main_actor,episode_number,type';
         $paramsMovie = ['is_hot'=>1, 'kind'=>Yii::$app->params['state_code']['film_movie']];// 热门电影
         $resultMovie = $this->getListData($select, $page, $pagesize, $paramsMovie);
@@ -178,7 +182,7 @@ class Film extends ActiveRecord {
         if($resultVariety['rows']) {
             $this->dealListField($resultVariety['rows']);
             $this->addEpisode($resultVariety['rows']);
-            $this->addType($resultVariety['rows']);
+//            $this->addType($resultVariety['rows']);
             $result[] = ['name'=>Yii::$app->params['text_desc']['hot_variety'], 'list'=>$resultVariety['rows']];
         }
         if($resultAnimation['rows']) {
@@ -186,6 +190,7 @@ class Film extends ActiveRecord {
             $this->addEpisode($resultAnimation['rows']);
             $result[] = ['name'=>Yii::$app->params['text_desc']['hot_animation'], 'list'=>$resultAnimation['rows']];
         }
+        Cache::setex($redisHotKey, Yii::$app->params['expire'], json_encode($result));
         return $result;
     }
     

@@ -161,6 +161,15 @@ class Cache {
      */
     public static function incr($key) {
         return Yii::$app->redis->incr($key);
+    }
+    
+    /**
+     * 获取剩余时间
+     * @param type $key
+     * @return type
+     */
+    public static function ttl($key) {
+        return Yii::$app->redis->ttl($key);
     } 
 }
 
