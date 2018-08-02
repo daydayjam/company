@@ -222,7 +222,24 @@ class FilmSpider extends ActiveRecord {
         }
         if($epUpdate > $FilmRecord->episode_number) {
             $FilmRecord->episode_number = $epUpdate;
-            if($FilmRecord->type == 1 || ($FilmRecord->type == 2 && $epUpdateNum < 2)) {
+            if($FilmRecord->is_hot == 1) {
+                $result = [];
+                $result['id'] = $FilmRecord->id;
+                $result['kind'] = $FilmRecord->kind;
+                $result['title'] = $FilmRecord->title;
+                $result['cover'] = $FilmRecord->cover;
+                $result['year'] = $FilmRecord->year;
+                $result['tag'] = $FilmRecord->genre;
+                $result['main_actor'] = $FilmRecord->main_actor;
+                $result['episode_number'] = $epUpdate;
+                $result['type'] = $FilmRecord->type;
+                $result['update_time'] = date('Y-m-d H:i:s');
+                $orderBy = $FilmRecord->year + strtotime($FilmRecord->update_time);
+                $CacheKey = 'FILM_HOT';
+                Yii::$app->redis->zadd($CacheKey . $FilmRecord->kind, $orderBy, $FilmRecord->id);
+                Yii::$app->redis->hset($CacheKey . $FilmRecord->kind . '_CONTENT', $FilmRecord->id, json_encode($result));
+            }
+            if($FilmRecord->type == 1 || ($FilmRecord->type == 2 && $epUpdateNum < 10)) {
                 $FilmRecord->episode_today = $epToday ? rtrim($epToday, '/') : $epToday;
             }
             return $FilmRecord->save();

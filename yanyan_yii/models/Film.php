@@ -151,11 +151,32 @@ class Film extends ActiveRecord {
         if (!is_numeric($page) || !is_numeric($pagesize) || $page < 0 || $pagesize < 0) {
             return $this->addError('', '-4:参数格式有误');
         }
-        $redisHotKey = 'FILM_HOT_LIST';
-        if(Cache::exists($redisHotKey)) {
-            return json_decode(Cache::get($redisHotKey), true);
+        $result = [];
+        $CacheKey = 'FILM_HOT';
+//        Yii::$app->redis->flushall();die;
+//        print_r(Yii::$app->redis->keys('FILM_HOT*'));die;
+//        print_r(Yii::$app->redis->hgetall('FILM_HOT3_CONTENT'));die;
+        if(Cache::exists($CacheKey)) {
+            // 获取分类标题信息
+            $hotFilmBrands = Cache::zrange($CacheKey, 0, 3);
+            foreach($hotFilmBrands as $key=>$value) {
+                $result[$key]['name'] = Yii::$app->params['text_desc']['hot_brand'][$value];
+                // 根据分类标题信息获取相应分类的id
+                $CacheListKey = $CacheKey . $value;
+                $listResult = Cache::zrevrange($CacheListKey, 0, 10);
+                foreach($listResult as $item) {
+                    $CacheContentKey = $CacheListKey . '_CONTENT';
+                    $rows = json_decode(Cache::hget($item, $CacheContentKey), true);
+                     // 处理年代等字段
+                    $this->dealField($rows);
+                    // 给电视剧类型的数据加上剧集信息
+                    $this->addEpisode($rows);
+                    $result[$key]['list'][] = $rows;
+                }
+            }
+            return $result;
         }
-        $select = 'id,kind,title,cover,year,genre as tag,main_actor,episode_number,type';
+        $select = 'id,kind,title,cover,year,genre as tag,main_actor,episode_number,type,update_time';
         $paramsMovie = ['is_hot'=>1, 'kind'=>Yii::$app->params['state_code']['film_movie']];// 热门电影
         $resultMovie = $this->getListData($select, $page, $pagesize, $paramsMovie);
         $paramsTv = ['is_hot'=>1, 'kind'=>Yii::$app->params['state_code']['film_tv']];// 热门电视剧
@@ -167,30 +188,58 @@ class Film extends ActiveRecord {
         
         $result = [];
         if($resultMovie['rows']) {
+            Cache::zadd($CacheKey, Yii::$app->params['state_code']['film_movie'], Yii::$app->params['state_code']['film_movie']);
+            foreach($resultMovie['rows'] as $value) {
+                $orderBy = $value['year'] + strtotime($value['update_time']);
+                Cache::zadd($CacheKey . Yii::$app->params['state_code']['film_movie'], $orderBy, $value['id']);
+                Cache::hset($value['id'], json_encode($value), $CacheKey . Yii::$app->params['state_code']['film_movie'] . '_CONTENT');
+            }
+            
             // 处理年代等字段
             $this->dealListField($resultMovie['rows']);
             // 给电视剧类型的数据加上剧集信息
-            $this->addEpisode($resultMovie['rows']);
+            $this->addListEpisode($resultMovie['rows']);
             $result[] = ['name'=>Yii::$app->params['text_desc']['hot_movie'], 'list'=>$resultMovie['rows']];
         }
         if($resultTv['rows']) {
+            Cache::zadd($CacheKey, Yii::$app->params['state_code']['film_tv'], Yii::$app->params['state_code']['film_tv']);
+            foreach($resultTv['rows'] as $value) {
+                $orderBy = $value['year'] + strtotime($value['update_time']);
+                Cache::zadd($CacheKey . Yii::$app->params['state_code']['film_tv'], $orderBy, $value['id']);
+                Cache::hset($value['id'], json_encode($value), $CacheKey . Yii::$app->params['state_code']['film_tv'] . '_CONTENT');
+            }
+            
             $this->dealListField($resultTv['rows']);
             // 给电视剧类型的数据加上剧集信息
-            $this->addEpisode($resultTv['rows']);
+            $this->addListEpisode($resultTv['rows']);
             $result[] = ['name'=>Yii::$app->params['text_desc']['hot_tv'], 'list'=>$resultTv['rows']];
         }
         if($resultVariety['rows']) {
+            Cache::zadd($CacheKey, Yii::$app->params['state_code']['film_variety'], Yii::$app->params['state_code']['film_variety']);
+            foreach($resultVariety['rows'] as $value) {
+                $orderBy = $value['year'] + strtotime($value['update_time']);
+                Cache::zadd($CacheKey . Yii::$app->params['state_code']['film_variety'], $orderBy, $value['id']);
+                Cache::hset($value['id'], json_encode($value), $CacheKey . Yii::$app->params['state_code']['film_variety'] . '_CONTENT');
+            }
+            
             $this->dealListField($resultVariety['rows']);
-            $this->addEpisode($resultVariety['rows']);
+            $this->addListEpisode($resultVariety['rows']);
 //            $this->addType($resultVariety['rows']);
             $result[] = ['name'=>Yii::$app->params['text_desc']['hot_variety'], 'list'=>$resultVariety['rows']];
         }
         if($resultAnimation['rows']) {
+            Cache::zadd($CacheKey, Yii::$app->params['state_code']['film_animation'], Yii::$app->params['state_code']['film_animation']);
+            foreach($resultAnimation['rows'] as $value) {
+                $orderBy = $value['year'] + strtotime($value['update_time']);
+                Cache::zadd($CacheKey . Yii::$app->params['state_code']['film_animation'], $orderBy, $value['id']);
+                Cache::hset($value['id'], json_encode($value), $CacheKey . Yii::$app->params['state_code']['film_animation'] . '_CONTENT');
+            }
+            
             $this->dealListField($resultAnimation['rows']);
-            $this->addEpisode($resultAnimation['rows']);
+            $this->addListEpisode($resultAnimation['rows']);
             $result[] = ['name'=>Yii::$app->params['text_desc']['hot_animation'], 'list'=>$resultAnimation['rows']];
         }
-        Cache::setex($redisHotKey, Yii::$app->params['expire'], json_encode($result));
+        
         return $result;
     }
     
@@ -208,11 +257,19 @@ class Film extends ActiveRecord {
         }
     }
     
+    public function dealField(&$item) {
+        $item['year']           = $item['year'] != Yii::$app->params['state_code']['year_unknown'] ? (string)$item['year'] : Yii::$app->params['text_desc']['year_unknown'];
+        $item['main_actor']     = $item['main_actor'] ? $item['main_actor'] : Yii::$app->params['text_desc']['no_main_actor'];
+        if(isset($item['summary'])) {
+            $item['summary']    = $item['summary'] ? $item['summary'] : Yii::$app->params['text_desc']['no_summary'];
+        }
+    }
+    
     /**
      * 给电视剧类型的数据加上剧集信息
      * @param type $list
      */
-    public function addEpisode(&$list) {
+    public function addListEpisode(&$list) {
         $loginUid = Cache::hget('id');
         $FilmFollow = new FilmFollow();
         foreach($list as $key=>$value) {
@@ -236,6 +293,30 @@ class Film extends ActiveRecord {
             }
         }
     }
+    
+     public function addEpisode(&$item) {
+        $loginUid = Cache::hget('id');
+        $FilmFollow = new FilmFollow();
+        $item['is_follow'] = Yii::$app->params['state_code']['follow_no'];
+        $FilmFollowRecord = $FilmFollow->findByCondition(['film_id'=>$item['id'], 'user_id'=>$loginUid])->one();
+        if($FilmFollowRecord) {
+            $item['is_follow'] = Yii::$app->params['state_code']['follow_yes'];
+        }
+        if($item['type'] == Yii::$app->params['state_code']['film_tv']) {
+            $item['follow_number'] = 0;
+            $item['view_number'] = 1;
+            $ViewRecord = new ViewRecord();
+            $VRRecord = $ViewRecord->findByCondition(['user_id'=>$loginUid, 'film_id'=>$item['id']])->one();
+            if($VRRecord) {
+                $item['view_number'] = $VRRecord->number;
+            }
+            $item['tip'] = '更新至' . $item['episode_number'] . '集';
+            if($FilmFollowRecord) {
+                $item['follow_number'] = $FilmFollowRecord->number;
+            }
+        }
+    }
+    
     
     /**
      * 通过关键字搜索影视剧
@@ -406,7 +487,7 @@ class Film extends ActiveRecord {
                 $query->andWhere('year<2014');
             }
         }
-        $data = $query->orderBy('year desc, update_time desc')
+        $data = $query->orderBy('update_time desc')
                         ->limit($pagesize)
                         ->offset(($page-1)*$pagesize)
                 

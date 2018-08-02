@@ -19,10 +19,10 @@ class NewsController extends Controller {
      */
     public function actionList() {
         $page = $this->getParam('page', 1);
-        if(isset($_REQUEST['pagesize'])) {
+        $pagesize = $this->getParam('pagesize', 10);
+        if($pagesize == 10) {
             $page = $page + 1;
         }
-        $pagesize = $this->getParam('pagesize', 10);
         $News = new News();
         $result = $News->getList($page, $pagesize);
         if($result === false) {

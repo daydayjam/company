@@ -32,7 +32,7 @@ class News extends ActiveRecord {
      * @param int $pagesize 每页显示记录数
      * @return array
      */
-    public function getList($page = 0, $pagesize = 10) {
+    public function getList($page = 1, $pagesize = 10) {
         $loginUid = Cache::hget('id');
         if(!is_numeric($page) || !is_numeric($pagesize)) {
             $this->addError('', '-4:参数格式有误');

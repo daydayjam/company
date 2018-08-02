@@ -171,5 +171,17 @@ class Cache {
     public static function ttl($key) {
         return Yii::$app->redis->ttl($key);
     } 
+    
+    public static function zadd($key, $score, $member) {
+        return Yii::$app->redis->zadd($key, $score, $member);
+    }
+    
+    public static function zrange($key, $start, $stop) {
+        return Yii::$app->redis->zrange($key, $start, $stop);
+    }
+    
+    public static function zrevrange($key, $start, $stop) {
+        return Yii::$app->redis->zrevrange($key, $start, $stop);
+    }
 }
 
