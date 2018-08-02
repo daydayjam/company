@@ -104,6 +104,28 @@ class Film extends ActiveRecord {
             $this->addError('', '0:设置失败');
             return false;
         }
+        // 修改影视剧热门列表缓存中的值
+        // 取消热门，将缓存中的值删除
+        $CacheKey = 'FILM_HOT';
+        if($isHot == 0) {
+            Yii::$app->redis->zrem($CacheKey .$Record->kind, $Record->id);
+            Yii::$app->redis->hdel($CacheKey .$Record->kind . '_CONTENT', $Record->id);
+        }else {
+            $result = [];
+            $result['id'] = $Record->id;
+            $result['kind'] = $Record->kind;
+            $result['title'] = $Record->title;
+            $result['cover'] = $Record->cover;
+            $result['year'] = $Record->year;
+            $result['tag'] = $Record->genre;
+            $result['main_actor'] = $Record->main_actor;
+            $result['episode_number'] = $Record->episode_number;
+            $result['type'] = $Record->type;
+            $result['update_time'] = date('Y-m-d H:i:s');
+            $orderBy = $Record->year + strtotime($Record->update_time);
+            Yii::$app->redis->zadd($CacheKey . $Record->kind, $orderBy, $Record->id);
+            Yii::$app->redis->hset($CacheKey . $Record->kind . '_CONTENT', $Record->id, json_encode($result));
+        }
         return true;
     }
     
@@ -184,6 +206,23 @@ class Film extends ActiveRecord {
             return false;
         }
         $this->commit();
+        if($Record->is_hot == 1) {
+            $result = [];
+            $result['id'] = $Record->id;
+            $result['kind'] = $Record->kind;
+            $result['title'] = $Record->title;
+            $result['cover'] = $Record->cover;
+            $result['year'] = $Record->year;
+            $result['tag'] = $Record->genre;
+            $result['main_actor'] = $Record->main_actor;
+            $result['episode_number'] = $Record->episode_number;
+            $result['type'] = $Record->type;
+            $result['update_time'] = date('Y-m-d H:i:s');
+            $orderBy = $Record->year + strtotime($Record->update_time);
+            $CacheKey = 'FILM_HOT';
+            Yii::$app->redis->zadd($CacheKey . $Record->kind, $orderBy, $Record->id);
+            Yii::$app->redis->hset($CacheKey . $Record->kind . '_CONTENT', $Record->id, json_encode($result));
+        }
         return true;
     }
     
@@ -214,7 +253,7 @@ class Film extends ActiveRecord {
         }
         return true;
     }
-    
+
     /**
      * 启动事务
      * @return void 无返回值

@@ -44,7 +44,7 @@
     <div class="form-group">
         <label class="col-sm-2 control-label">国家</label>
         <div class="col-sm-8" id="flags-box">
-            <input type="text" class="form-control" id="area" name="year" value="<?= $data['area'] ?>" placeholder="国家">
+            <input type="text" class="form-control" id="area" name="area" value="<?= $data['area'] ?>" placeholder="国家">
         </div>
     </div>
     <div class="form-group">
