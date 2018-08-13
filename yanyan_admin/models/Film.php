@@ -211,14 +211,14 @@ class Film extends ActiveRecord {
             $result['id'] = $Record->id;
             $result['kind'] = $Record->kind;
             $result['title'] = $Record->title;
-            $result['cover'] = $Record->cover;
+            $result['cover'] = Tool::connectPath(Yii::$app->params['image_domain'], $Record->cover);
             $result['year'] = $Record->year;
             $result['tag'] = $Record->genre;
             $result['main_actor'] = $Record->main_actor;
             $result['episode_number'] = $Record->episode_number;
             $result['type'] = $Record->type;
             $result['update_time'] = date('Y-m-d H:i:s');
-            $orderBy = $Record->year + strtotime($Record->update_time);
+            $orderBy = $Record->year + strtotime($result['update_time']);
             $CacheKey = 'FILM_HOT';
             Yii::$app->redis->zadd($CacheKey . $Record->kind, $orderBy, $Record->id);
             Yii::$app->redis->hset($CacheKey . $Record->kind . '_CONTENT', $Record->id, json_encode($result));
