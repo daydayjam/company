@@ -94,11 +94,12 @@ class ViewRecord extends ActiveRecord {
         // 处理影视剧类型
         $Route = new Route();
         foreach($result['rows'] as $key=>$item) {
+            $result['rows'][$key]['view_num'] = $item['number'];
             $result['rows'][$key]['number'] = '已观看到' . $item['number'] . '集';
             $result['rows'][$key]['cover'] = Tool::connectPath(Yii::$app->params['image_domain'], $item['cover']);
             $result['rows'][$key]['create_time'] = substr($item['create_time'], 0, 4) == date('Y') ? substr($item['create_time'], 5, 5) : substr($item['create_time'], 0, 10);
             $result['rows'][$key]['route'] = $Route->getFullName($item['route_id']);
-            unset($result['rows'][$key]['route_id']);
+//            unset($result['rows'][$key]['route_id']);
         }
         return $result;
     }

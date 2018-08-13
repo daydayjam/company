@@ -241,6 +241,8 @@ class FilmSpider extends ActiveRecord {
             }
             if($FilmRecord->type == 1 || ($FilmRecord->type == 2 && $epUpdateNum < 10)) {
                 $FilmRecord->episode_today = $epToday ? rtrim($epToday, '/') : $epToday;
+            }else {
+                $FilmRecord->episode_today = '';
             }
             return $FilmRecord->save();
         }

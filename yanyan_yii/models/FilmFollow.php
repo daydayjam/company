@@ -223,7 +223,7 @@ class FilmFollow extends ActiveRecord {
      */
     public function getList($page = 1, $pagesize = 10, $order = 'update_time') {
         $loginUid = Cache::hget('id');
-        if(!is_numeric($page) || !is_numeric($pagesize) || $page < 0 || $pagesize < 0) {
+        if(!is_numeric($page) || !is_numeric($pagesize) || $page < 1 || $pagesize < 1) {
             return $this->addError('', '-4:参数格式有误');
         }
         $select = 'user_id,film_id,number,episode_today';
