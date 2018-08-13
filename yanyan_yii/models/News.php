@@ -32,14 +32,19 @@ class News extends ActiveRecord {
      * @param int $pagesize 每页显示记录数
      * @return array
      */
-    public function getList($page = 1, $pagesize = 10) {
+    public function getList($newsId = 0, $page = 1, $pagesize = 10) {
         $loginUid = Cache::hget('id');
         if(!is_numeric($page) || !is_numeric($pagesize)) {
             $this->addError('', '-4:参数格式有误');
             return false;
         }
         $andParams = ['is_delete'=>0];
-        $result = $this->getListData('*', $page, $pagesize, $andParams, $order = 'pubdate desc,create_time desc');
+        $opParams = null;
+        if($newsId && $page > 1) {
+            $andParams['id'] = $newsId;
+            $opParams = ['id'=>'<'];
+        }
+        $result = $this->getListData('*', $page, $pagesize, $andParams, $order = 'id desc', $opParams);
         
         foreach($result['rows'] as $key=>$item) {
             $this->getNewsMixInfo($result['rows'][$key], $item);
@@ -63,7 +68,7 @@ class News extends ActiveRecord {
             return false;
         }
         $Record = $this->findOne($id);
-        if(!$Record && $Record->is_delete == 1) {
+        if(!$Record || $Record->is_delete == 1) {
             $this->addError('', '-7:要访问的资讯不存在哦');
             return false;
         }
@@ -72,11 +77,11 @@ class News extends ActiveRecord {
         $records['id'] = $Record->id;
         $records['title'] = $Record->title;
         $records['source_type'] = $Record->source_type;
-        $records['source_from'] = '来自' . self::$sourceType[$Record->source_type];
         $records['author'] = json_decode($Record->author, true);
+        $records['source_from'] = '来自' . self::$sourceType[$Record->source_type];
         $records['cover'] = Tool::startWith($Record->cover, 'http') ? $Record->cover : 'http:' . $Record->cover;
         $records['description'] = $Record->description;
-        $records['content'] = $Record->source_type == 1 ? $this->concatHtml($Record->title, $Record->content, $Record->pubdate, $Record->source_type) : $Record->content;
+        $records['content'] = $Record->source_type == 1 ? $this->concatHtml($Record->title, $Record->content, $Record->pubdate, $Record->source_type, $records['author']['name']) : $Record->content;
         $records['video_info'] = $Record->video_info ? json_decode($Record->video_info, true) : new \stdClass();
         $records['pics'] = $Record->pics ? json_decode($Record->pics, true) : [];
         $records['source_url'] = $Record->source_url;
@@ -102,11 +107,11 @@ class News extends ActiveRecord {
      * @param type $pubdate
      * @param type $sourceType
      */
-    public function concatHtml($title, $content, $pubdate, $sourceType) {
+    public function concatHtml($title, $content, $pubdate, $sourceType, $author) {
         $html = '';
         $html .= '<h2>' . $title . '</h2>';
         $html .= '<span style="color:#b3b3b3">' . $pubdate . '</span> ';
-        $html .= '<span style="color:#b3b3b3">来自' . self::$sourceType[$sourceType] . '</span>';
+        $html .= '<span style="color:#b3b3b3">来自' . self::$sourceType[$sourceType] . '-' . $author . '</span>';
         $html .= $content;
         $replaceHtml = '<img width="100%"  src="' . Yii::$app->params['image_domain']  . '/system/default_video.png" />';
         $html = preg_replace('/<iframe.+?>/', "", $html);

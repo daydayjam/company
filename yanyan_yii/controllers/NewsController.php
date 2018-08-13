@@ -20,11 +20,12 @@ class NewsController extends Controller {
     public function actionList() {
         $page = $this->getParam('page', 1);
         $pagesize = $this->getParam('pagesize', 10);
+        $newsId = $this->getParam('news_id', 0);
         if($pagesize == 10) {
             $page = $page + 1;
         }
         $News = new News();
-        $result = $News->getList($page, $pagesize);
+        $result = $News->getList($newsId, $page, $pagesize);
         if($result === false) {
             $this->showError($News);
         }

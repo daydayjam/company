@@ -243,7 +243,7 @@ class Controller extends \yii\web\Controller {
         $url = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . urldecode(http_build_query($_REQUEST));
         if (file_exists($logFile)) {
             if(!Cache::get('access_ctime')) {
-                unlink($logFile);
+                @unlink($logFile);
             }
         }
         if (!file_exists($logFile)) {

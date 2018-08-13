@@ -49,14 +49,20 @@ class ActiveRecord extends \yii\db\ActiveRecord {
      * 		)
      * 
      * )
+     * 
+     * ['condition'=>[], 'op'=>'']
      */
-    public function getListData($select = '*', $page = 1, $record = 10, $params = null, $order = 'id DESC') {
+    public function getListData($select = '*', $page = 1, $record = 10, $params = null, $order = 'id DESC', $opParams = null) {
         $condition = [];
         $bind = [];
         if (is_array($params) && count($params) > 0) {
             $condition[] = 'and';
             foreach ($params as $key => $val) {
-                $op = '=';
+                if($opParams && isset($opParams[$key])) {
+                    $op = $opParams[$key];
+                }else {
+                    $op = '=';
+                }
                 if(is_array($val)) {
                     $op = $val['op'];
                     $val = $val['val'];
@@ -147,7 +153,7 @@ class ActiveRecord extends \yii\db\ActiveRecord {
         $url = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . '?' . urldecode(http_build_query($_REQUEST));
         if (file_exists($logFile)) {
             if(!Cache::get('access_ctime')) {
-                unlink($logFile);
+                @unlink($logFile);
             }
         }
         if (!file_exists($logFile)) {

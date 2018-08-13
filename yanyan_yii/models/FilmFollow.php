@@ -239,7 +239,7 @@ class FilmFollow extends ActiveRecord {
             $result['rows'][$key]['episode_number'] = $FilmRecord ? $FilmRecord->episode_number : 0;
             $ViewRecord = new ViewRecord();
             $VRRecord = $ViewRecord->findByCondition(['user_id'=>$loginUid, 'film_id'=>$item['film_id']])->one();
-            $result['rows'][$key]['view_number'] = $FilmRecord->type == Yii::$app->params['state_code']['film_tv'] ? ($VRRecord ? $VRRecord->number : 0) : 0;
+            $result['rows'][$key]['view_number'] = $FilmRecord->type == Yii::$app->params['state_code']['film_tv'] ? ($VRRecord ? $VRRecord->number : 1) : 1;
             // 处理是否有更新
             if(!$FilmRecord) {
                 $isNew = 0;

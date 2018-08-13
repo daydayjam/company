@@ -220,7 +220,7 @@ class FilmSpider extends ActiveRecord {
                 }
             }
         }
-        if($epUpdate > $FilmRecord->episode_number) {
+        if($epUpdate > $FilmRecord->episode_number || $epToday) {
             $FilmRecord->episode_number = $epUpdate;
             if($FilmRecord->is_hot == 1) {
                 $result = [];

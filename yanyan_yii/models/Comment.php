@@ -754,7 +754,6 @@ class Comment extends ActiveRecord {
             $this->addError('', '-4:参数格式有误');
             return false;
         }
-        
         $sql = "select " 
                     . "c.id,c.uid,c.assoc_type,c.ctype,c.assoc_id,c.mcid,c.ep_num,if(c.ep_num>0,concat('第',c.ep_num,'集'),'') as ep_title,c.comment_id,c.comment,"
                     . "unix_timestamp(c.create_time) as create_time,if(c.uid>0,u.nickname,'') as nickname,"
@@ -772,10 +771,9 @@ class Comment extends ActiveRecord {
             $isBlack = 'and black.to_uid is null';
   	}
   	$sql .= " where ((c.mcid=0 and c.assoc_type=0) or c.assoc_type=11) and u.status!=-1 and (c.is_delete=0 or c.is_delete=11) " . $isBlack . " order by c.create_time desc limit ".(($page-1)*$pagesize).",".$pagesize;
-        
         $records = Yii::$app->db->createCommand($sql)
                 ->queryAll();
-        if($records) {
+        if($records) {$this->writeLog('comment12');
             $CommentHelper = new CommentHelper();
             $CommentHelper->addListIsPraise($records, $loginUid);
             $CommentHelper->addListDomain($records, 'pics');
