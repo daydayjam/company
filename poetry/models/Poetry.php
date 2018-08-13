@@ -181,6 +181,7 @@ class Poetry extends ActiveRecord {
 //    }
     
     public function getListByTitleOrContent($keyword, $page = 1, $pagesize = 10) {
+        $keywordArr = Tool::splitByMark($keyword);
         $options = [
             'hostname' => Yii::$app->params['solr']['HOSTNAME'],
             'login'    => Yii::$app->params['solr']['LOGIN'],
@@ -189,15 +190,20 @@ class Poetry extends ActiveRecord {
             'path'     => Yii::$app->params['solr']['PATH']
         ];
         $client = new \SolrClient($options);
-        $query = new \SolrDisMaxQuery();
+        $q = '';
+        foreach($keywordArr as $key=>$value) {
+            $q .= 'sortField:*' . $value . '*^300 '
+            . 'OR content:"' . $value . '"^10 '
+            . 'OR title:"' . $value . '"^6 '
+            . 'OR author:"' . $value . '"^4 '
+            . 'OR content:' . $value . '^2 '
+            . 'OR title:' . $value . '^1 '
+            . 'OR author:' . $value . '^0.5';
+        }
         
-        $query->setPhraseFields('content^100')
-              ->setMinimumMatch('100%')
-              ->addQueryField('searchText');
-//              ->addQueryField('title', 0.3)
-//              ->addQueryField('author', 0.1);
+        $query = new \SolrDisMaxQuery($q);
+        $query->setMinimumMatch(2);
         
-        $query->setQuery($keyword);
         $query->setStart(($page-1)*$pagesize);
         $query->setRows($pagesize);
         $query->addField('id')->addField('title')->addField('content')->addField('year')->addField('author');
