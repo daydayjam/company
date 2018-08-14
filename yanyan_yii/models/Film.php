@@ -28,7 +28,7 @@ class Film extends ActiveRecord {
      * @param int $id 影片ID
      * @return array
      */
-    public function getInfo($id) {
+    public function getInfo($id, $clientType = '', $versionNo = '') {
         $loginUid = Cache::hget('id');
         $result = [];
         // 获取影视剧基本信息
@@ -38,7 +38,7 @@ class Film extends ActiveRecord {
             $this->addError('', $error['code'] . ':' . $error['msg']);
             return false;
         }
-        $result['is_play'] = Yii::$app->params['version']['ios']['is_play'];
+        $result['is_play'] = Tool::isReviewing($clientType, $versionNo) ? Yii::$app->params['state_code']['hidden_yes'] : Yii::$app->params['state_code']['hidden_no'];
         $result['film_info'] = $filmInfo;
         // 获取观看记录
         $ViewRecord = new ViewRecord();

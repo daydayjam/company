@@ -15,23 +15,6 @@ class Controller extends \yii\web\Controller {
     public $enableCsrfValidation = false;
     
     /**
-     * 当前页
-     * @var type 
-     */
-    public $page = '';
-    
-    /**
-     * 每页显示多少条
-     * @var type 
-     */
-    public $size = '';
-    
-    /**
-     * 查询条件起始值
-     */
-    public $from = 0;
-    
-    /**
      * 构造方法，用于初始化所有控制器
      * @param string $id
      * @param string $module
@@ -56,7 +39,9 @@ class Controller extends \yii\web\Controller {
         if(strpos($route1, '/') === 0) {
             $route1 = substr($route1, 1);
         }
-        $route2 = $this->getUniqueId() . '/*';//全匹配
+        $uniqueId = $this->getUniqueId();
+        $uniqueIdArr = explode('/', $uniqueId);
+        $route2 = array_pop($uniqueIdArr) . '/*';//全匹配
         if(in_array($route1, $routes['guest']) || in_array($route2, $routes['guest'])) {
             if(!empty($code)) {
                 Cache::expire($code, Yii::$app->params['expire']);
@@ -116,11 +101,16 @@ class Controller extends \yii\web\Controller {
      * 输出正确JSON消息，调用此方法，程序会退出
      * @param array $data 输出的其他信息，默认为null
      */
-    public function showOk($data = null) {
+    public function showOk($data = null, $addField = null) {
         $result = [
             'code' => 1,
             'msg' => '操作成功'
         ];
+        if($addField !== null) {
+            foreach($addField as $key=>$value) {
+                $result[$key] = $value;
+            }
+        }
         if($data !== null) {
             $data = ['data' => $data];
             $result = array_merge($result, $data);
@@ -133,11 +123,11 @@ class Controller extends \yii\web\Controller {
      * 输出正确JSON消息，调用此方法，程序会退出
      * @param array $data 输出的其他信息，默认为null
      */
-    public function showOkIos($data = null) {
+    public function showOkIos($data = null, $clientType, $versionNo) {
         $result = [
             'code' => 1,
             'msg' => '操作成功',
-            'is_play' => Yii::$app->params['version']['ios']['is_play']
+            'is_play' => Tool::isReviewing($clientType, $versionNo) ? Yii::$app->params['state_code']['hidden_yes'] : Yii::$app->params['state_code']['hidden_no']
         ];
         if($data !== null) {
             $data = ['data' => $data];
@@ -267,14 +257,5 @@ class Controller extends \yii\web\Controller {
         fwrite($fp, str_replace('\n', '\n<br />', $text));
         fclose($fp);
     }
-    
-    /**
-    * 获取分页内容
-    */
-   public function getPageAndSize($page, $pagesize) {
-       $this->page = !empty($page) ? $page : 1;
-       $this->size = !empty($pagesize) ? $pagesize : Yii::$app->params['page_size'];
-       $this->from = ($this->page - 1) * $this->size;
-   }
 }
 

@@ -21,9 +21,6 @@ class NewsController extends Controller {
         $page = $this->getParam('page', 1);
         $pagesize = $this->getParam('pagesize', 10);
         $newsId = $this->getParam('news_id', 0);
-        if($pagesize == 10) {
-            $page = $page + 1;
-        }
         $News = new News();
         $result = $News->getList($newsId, $page, $pagesize);
         if($result === false) {

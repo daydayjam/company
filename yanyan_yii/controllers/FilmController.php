@@ -11,7 +11,7 @@ use app\components\Controller;
 use app\models\Film;
 use app\models\FilmSource;
 use app\models\FilmFollow;
-use app\models\ViewRecord;
+use app\models\Tool;
 use app\models\SearchTag;
 
 class FilmController extends Controller {
@@ -53,8 +53,10 @@ class FilmController extends Controller {
      */
     public function actionInfo() {
         $id = $this->getParam('id');
+        $clientType = $this->getParam('client_type');
+        $versionNo = $this->getParam('version_no');
         $Film = new Film();
-        $result = $Film->getInfo($id);
+        $result = $Film->getInfo($id, $clientType, $versionNo);
         if(!$result) {
             $this->showError($Film);
         }
@@ -113,12 +115,15 @@ class FilmController extends Controller {
     public function actionNewlist() {
         $page = $this->getParam('page', 1);
         $pagesize = $this->getParam('pagesize', 8);
+        $clientType = $this->getParam('client_type');
+        $versionNo = $this->getParam('version_no');
         $Film = new Film();
         $result = $Film->getNewList($page, $pagesize);
         if($result === false) {
             $this->showError($Film);
         }
-        $this->showOkIos($result);
+        $this->showOk($result, 
+                ['is_play'=>Tool::isReviewing($clientType, $versionNo) ? Yii::$app->params['state_code']['hidden_yes'] : Yii::$app->params['state_code']['hidden_no']]);
     }
     
     /**

@@ -3,6 +3,7 @@ $route = [
     //未登录用户可以访问的路由
     'guest' => [
         'test/*',
+        'test/*',
         'film/*',
         'filmsource/*',
         'viewrecord/*',

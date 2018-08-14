@@ -327,5 +327,19 @@ class Tool {
         $arr = preg_split($reg, $str);
         return array_values(array_filter($arr));
     } 
+    
+    /**
+     * 获取是否是审核中的版本
+     * @param string $clientType
+     * @param string $versionNo
+     * @return boolean
+     */
+    public static function isReviewing($clientType, $versionNo) {
+        $reviewingVersionNo = Yii::$app->params['version']['ios']['reviewing_no'];
+        if($clientType == Yii::$app->params['state_code']['ios'] && $versionNo == $reviewingVersionNo) {
+            return true;
+        }
+        return false;
+    }
 }
 

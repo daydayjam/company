@@ -63,6 +63,7 @@ class FilmSource extends ActiveRecord {
         //  }
         // ]
         $records = $this->findByCondition(['film_id'=>$filmId, 'number'=>$epNum, 'status'=>Yii::$app->params['state_code']['status_normal']])->all();  
+        
         $routeArr = [];
         $lastRouteId = 0;
         $Route = new Route();
@@ -77,6 +78,9 @@ class FilmSource extends ActiveRecord {
             if(!in_array($RouteRecord->parent_id, $routeArr)) { 
                 $routeArr[] = $RouteRecord->parent_id;
                 $ParentRouteRecord = $Route->findOne($RouteRecord->parent_id);
+                if($ParentRouteRecord->status != Yii::$app->params['state_code']['status_normal']) {
+                    continue;
+                }
                 $routeArr[$RouteRecord->parent_id] = $ParentRouteRecord->name;
                 $result[$RouteRecord->parent_id]['name'] = $ParentRouteRecord->name;
                 $labelArr = explode('/', $value->label);
