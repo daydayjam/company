@@ -202,9 +202,9 @@ class TestController extends Controller {
     }
     
     public function actionE() {
-        $arr = Yii::$app->redis->keys('FILM_HOT*');
-        print_r($arr);die;
-        Yii::$app->redis->del($arr);
+        $result = ['name'=>111];
+        $result[] = ['age'=>22];
+        print_r($result);
     }
     
     

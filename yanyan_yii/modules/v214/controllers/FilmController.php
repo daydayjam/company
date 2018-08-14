@@ -115,12 +115,14 @@ class FilmController extends Controller {
     public function actionNewlist() {
         $page = $this->getParam('page', 1);
         $pagesize = $this->getParam('pagesize', 8);
+        $clientType = $this->getParam('client_type');
+        $versionNo = $this->getParam('version_no');
         $Film = new Film();
         $result = $Film->getNewList($page, $pagesize);
         if($result === false) {
             $this->showError($Film);
         }
-        $this->showOkIos($result);
+        $this->showOk($result, ['is_play'=>Tool::isReviewing($clientType, $versionNo) ? Yii::$app->params['state_code']['hidden_yes'] : Yii::$app->params['state_code']['hidden_no']]);
     }
     
     /**

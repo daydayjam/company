@@ -15,10 +15,10 @@ $config = [
     'bootstrap' => ['log'],
     'modules' => [
         'v1' => [
-            'class' => 'app\modules\v1\Module',
+            'class' => 'app\modules\v213\Module',
         ],
         'v2' => [
-            'class' => 'app\modules\v2\Module',
+            'class' => 'app\modules\v214\Module',
         ],
     ],
     'components' => [
